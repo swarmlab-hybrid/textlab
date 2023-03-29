@@ -1,6 +1,6 @@
 ## Swarmlab is a collection of services that aims to
 
- > -    provide teachers and professors with online remote tools to do their lessons
+ > -    provide teachers and professors tools to do their lessons
  > 
  > -    give students the opportunity to study real life examples in their chosen area of expertise
  > 
@@ -13,28 +13,30 @@
  > More info: http://docs.swarmlab.io/SwarmLab-HowTos/swarmlab/docs/swarmlab/docs/index.html
 
 
-
 ![alt text](images/swarmlab-network.png "")
 
-##  LabInstance xelatexthesis
+##  LabInstance textLab
 
 
 ## Quickstart
 
-This is a quickstart guide of howto use this *LabInstance xelatex thesis*
+This is a quickstart guide of howto use this **textLab**
 
 
-**HowTo use xeLatex**
+**HowTo use it
 
  (1) Edit xelatex/docs/main.tex
 
-> make edit-main-tex
+> make latex-edit
 
  (2) Compile LaTeX document
 
-> make build-xelatex-pdf
+> make latex-build
 
- (3) Downloading your finished document
+ (3) View pdf
+
+> make latex-view
+
 
 ### How to use biber
 
