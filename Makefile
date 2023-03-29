@@ -61,7 +61,10 @@ latex-build:
 latex-view:
 	@cd xelatex;  ./bin/latex-view.sh 2>/dev/null ; true
 
-latex-bib:
+latex-bib-edit:
+	@cd xelatex;  ./bin/swl-nvim /home/docs/metaptyxiako.bib 2>/dev/null ; true
+
+latex-bib-build:
 	@cd xelatex;  ./bin/make-bib.sh 2>/dev/null ; true
 
 latex-clean:

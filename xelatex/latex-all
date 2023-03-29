@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd /home; rm -f /home/main.log; xelatex -interaction=batchmode main
-#gvim main.log
-#okular main.pdf
-

@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# Include the variables that store the Docker service names
-# shellcheck disable=SC1091
-. /etc/opt/service_names
-
-localip=$(ip addr show dev eth0 | grep "inet " | cut -d ' ' -f 6  | cut -f 1 -d '/')
-nmap -sP "$localip/24" | grep Nmap | cut -d' ' -f5 | grep "_$MPI_WORKER_SERVICE_NAME_" > /project/hosts
