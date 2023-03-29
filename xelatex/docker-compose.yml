@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+
+  masterservice:
+    image: microservice-xelatexthesis
+    privileged: true
+    environment:
+     - NODENAME=microservice-xelatexthesis_masterservice_1.microservice-xelatexthesis_microservice-xelatexthesis
+     - NODENETWORK=microservice-xelatexthesis
+     - DISPLAY=${DISPLAY}
+    cap_add:
+      - NET_ADMIN
+    user: root
+    entrypoint: ["sec_bootstrap", "role=masterservice", "sec_master_service_name=masterservice", "sec_worker_service_name=workerservice"]
+    ports:
+      - "${R_PORT1}:3787"
+    #  - "${R_PORT2}:443"
+    networks:
+      - microservice-xelatexthesis
+    volumes:
+      - /tmp/microservice-xelatexthesis/xelatex/project:/home/docker/project
+      - /tmp/microservice-xelatexthesis/xelatex/sec_bootstrap:/usr/bin/sec_bootstrap
+      - /tmp/microservice-xelatexthesis/xelatex/latex-all:/usr/local/bin/latex-all
+      - /tmp/microservice-xelatexthesis/xelatex/docs:/home
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/microservice-xelatexthesis/xelatex/bin/ttyd.x86_64:/usr/bin/ttyd
+
+ 
+#  workerservice:
+#    image: microservice-xelatexthesis
+#    privileged: true
+#    environment:
+#     - NODENAME=microservice-xelatexthesis_masterservice_1.microservice-xelatexthesis_microservice-xelatexthesis
+#     - NODENETWORK=microservice-xelatexthesis
+#     - DISPLAY=${DISPLAY}
+#    cap_add:
+#      - NET_ADMIN
+#    user: root
+#    entrypoint: ["sec_bootstrap", "role=workerservice", "sec_master_service_name=masterservice", "sec_worker_service_name=workerservice"]
+#    #ports:
+#    #  - "${SSH_PORT}:22"
+#    networks:
+#      - microservice-xelatexthesis
+#    volumes:
+#      - /tmp/microservice-xelatexthesis/xelatex/project:/home/docker/project
+#      - /tmp/microservice-xelatexthesis/xelatex/project/data-www:/data-www
+#      - /tmp/microservice-xelatexthesis/xelatex/project/config/nginx.conf:/etc/nginx/nginx.conf
+#      - /tmp/microservice-xelatexthesis/xelatex/project/config/default.conf:/etc/nginx/conf.d/default.conf
+#      - /tmp/microservice-xelatexthesis/xelatex/project/config/supervisord.conf:/etc/supervisor/supervisord.conf
+
+networks:
+  microservice-xelatexthesis:

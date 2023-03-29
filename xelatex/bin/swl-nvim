@@ -1,0 +1,10 @@
+docker stop my-nvim-appl
+docker rm my-nvim-appl
+docker volume create my-nvim-volume
+
+echo $(pwd)
+if [ $# -eq 0 ]; then
+  docker run -it -v my-nvim-volume:/root -v $(pwd):/home --name my-nvim-appl  hub.swarmlab.io:5443/nvim /bin/bash -c "nvim"
+else
+  docker run -it -v my-nvim-volume:/root -v $(pwd):/home --name my-nvim-appl  hub.swarmlab.io:5443/nvim /bin/bash -c "nvim $1"
+fi

@@ -1,0 +1,6 @@
+
+    name: swarmlab_microservice-xelatexthesis
+    title: swarmlab_microservice-xelatexthesis
+    version: docs
+    nav:
+    - modules/ROOT/nav.adoc

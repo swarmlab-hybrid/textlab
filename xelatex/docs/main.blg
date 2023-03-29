@@ -1,0 +1,9 @@
+[0] Config.pm:311> INFO - This is Biber 2.16
+[0] Config.pm:314> INFO - Logfile is 'main.blg'
+[111] biber:340> INFO - === Wed Mar 29, 2023, 10:41:24
+[132] Biber.pm:415> INFO - Reading 'main.bcf'
+[251] Biber.pm:952> INFO - Found 3 citekeys in bib section 0
+[271] Biber.pm:4340> INFO - Processing section 0
+[288] Biber.pm:4531> INFO - Looking for bibtex format file 'example.bib' for section 0
+[302] Utils.pm:411> ERROR - Cannot find 'example.bib'!
+[303] Biber.pm:132> INFO - ERRORS: 1

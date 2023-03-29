@@ -1,0 +1,13 @@
+create       create project      (swarmlab-sec create)
+up           start swarmlab-sec  (swarmlab-sec up size=10)
+scale        resize swarmlab-sec (swarmlab-sec scale size=30)
+reload       rebuild image       (swarmlab-sec reload size=15)
+login        login swarmlab-sec  (swarmlab-sec login)
+exec         execute command     (swarmlab-sec exec [SHELL COMMAND])
+down         stop swarmlab-sec   (swarmlab-sec down)
+clean        clean project       (swarmlab-sec clean)
+list         show instances      (swarmlab-sec list)
+help         show help           (swarmlab-sec help)
+
+
+

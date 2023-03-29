@@ -1,0 +1,758 @@
+#!/bin/bash
+
+# The MIT License (MIT)
+#
+# rootApostolos@swarmlab.io
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Origin: https://github.com/NLKNguyen/alpine-mpich
+
+set -e
+
+DOCKERuser="docker"
+PACKAGES=$(cat <<EOF
+	net-tools  \
+	tcpdump \
+	sudo \
+	vim 
+EOF
+)
+# PACKAGES enabled ths with apt-get update && apt-get $APTPARAM install -y openssh-server $PACKAGES in in RUN export DEBIAN_FRONTEND=noninteractive 
+APTPARAM=" --no-install-recommends "
+IMAGE_local="microservice-xelatexthesis"
+HYBRID_NETWORK="microservice-xelatexthesis"
+# dont edit
+#IMAGE_origin="hub.swarmlab.io:5480/hybrid-numpy"
+IMAGE_origin="hub.swarmlab.io:5480/xelatex-basegui"
+bootstrap="sec_bootstrap"
+hostnames="auto_update_hosts"
+hostnames_get="get_hosts"
+#NODENAME=${HYBRID_NETWORK}_masterservice_1.${HYBRID_NETWORK}_${HYBRID_NETWORK}
+NODENAME=${IMAGE_local}_masterservice_1.${IMAGE_local}_${HYBRID_NETWORK}
+NODENETWORK=${HYBRID_NETWORK}
+# shellcheck disable=SC1091
+#. ./.env
+
+
+# -----------------------------------------------
+# 
+#  Find Source path of swarmlab.io script
+#
+# ----------------------------------------------
+
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+
+# -----------------------------------------------
+# 
+#  Load Default config swarmlab.io 
+#
+# ----------------------------------------------
+
+
+#. $DIR/.env
+
+
+# -----------------------------------------------
+# 
+#  Find Working dir 
+#
+# ----------------------------------------------
+
+function EPHEMERAL_PORT() {
+    LOW_BOUND=49152
+    RANGE=16384
+    while true; do
+        CANDIDATE=$[$LOW_BOUND + ($RANDOM % $RANGE)]
+        (echo "" >/dev/tcp/127.0.0.1/${CANDIDATE}) >/dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            echo $CANDIDATE
+            break
+        fi
+    done
+}
+
+servicesshport=$(EPHEMERAL_PORT)
+
+Wdir=$(pwd)
+
+if [ ! -f $Wdir/.env ]; then
+cat << EOF > $Wdir/.env
+REGISTRY_ADDR=localhost
+REGISTRY_PORT=5000
+IMAGE_NAME=$HYBRID_NETWORK
+SSH_PORT=$servicesshport
+WEB_PORT=$(EPHEMERAL_PORT)
+WEB_PORT1=$(EPHEMERAL_PORT)
+WEB_PORT2=$(EPHEMERAL_PORT)
+R_PORT1=$(EPHEMERAL_PORT)
+R_PORT2=$(EPHEMERAL_PORT)
+R_PORT3=$(EPHEMERAL_PORT)
+R_PORT4=$(EPHEMERAL_PORT)
+R_PORT5=$(EPHEMERAL_PORT)
+EOF
+fi
+
+. $Wdir/.env
+
+create_dockerfile ()
+{
+    docker pull $IMAGE_origin << ANSWERS
+yes
+yes
+yes
+ANSWERS
+
+. $Wdir/ROOT_PASSWORD
+if [ -d "$Wdir/project" ]; then
+	# -----------------------------------------------
+	# 
+	#  create Dockerfile
+	#
+	# ----------------------------------------------
+
+        search='ok'
+
+	if [ $search == 'ok' ]
+	then
+        	echo ""
+		echo ">>>	Load Origin 	"
+		cat << EOF > $Wdir/Dockerfile
+		FROM $IMAGE_origin
+		#
+		USER root
+
+		COPY $bootstrap /usr/bin
+		COPY $hostnames_get /usr/bin
+		COPY $hostnames /usr/bin
+		COPY install-vim-plugin.sh .
+
+		ENV NOTVISIBLE "in users profile"
+		ENV USER1 docker
+		ENV USER_HOME /home/docker
+                ENV SSHDIR \${USER_HOME}/.ssh
+                ENV PATH=${PATH}:/usr/local/texlive/bin/x86_64-linuxmusl:/usr/local/texlive/2020/bin/x86_64-linuxmusl
+		COPY ssh/ \${SSHDIR}/
+
+		RUN export DEBIAN_FRONTEND=noninteractive  \
+		 && rm -rf /usr/share/doc \
+		 && rm -rf /usr/share/man \
+		 && rm -rf /usr/share/locale \
+		 && mkdir -p /var/run/sshd \
+                 && addgroup -S docker && adduser -S docker -G docker \
+		 && echo 'root:$ROOT_PASSWORD' | chpasswd \
+		 && echo "export VISIBLE=now" >> /etc/profile \
+		 && mkdir -p /home/docker/project \
+		 && mkdir -p /etc/opt \
+		&& echo "docker:docker" | chpasswd \
+		&& echo "StrictHostKeyChecking no" > \${SSHDIR}/config \
+		&& cat \${SSHDIR}/*.pub >> \${SSHDIR}/authorized_keys \
+		&& chmod -R 600 \${SSHDIR}/* \
+	        && chown -R \${USER1}:\${USER1} \${SSHDIR}
+
+
+                COPY custom /tmp/bin
+                RUN /tmp/bin/setup.sh
+
+
+		COPY  .vimrc /home/docker 
+		EXPOSE 3787
+
+EOF
+	fi
+else
+	echo ""
+	echo "Not in Project Directory"
+	echo "A  project directory should look like this"
+	echo ""
+
+cat <<EOF 
+├── docker-compose.yml
+├── Dockerfile
+├── out.log
+├── project
+│   └── hello_world.sh
+└── ssh
+    ├── id_rsa
+    └── id_rsa.pub
+EOF
+	echo "Change to your Project Directory And Try Again"
+        echo ""
+exit 0
+fi
+}
+
+create_project ()
+{
+
+    docker pull $IMAGE_origin << ANSWERS
+yes
+yes
+yes
+ANSWERS
+if [ "$Wdir" ==  "$HOME" ]; then
+        echo""
+	echo "You are in Your Home directory"
+	echo "Please create a project directory"
+	echo "mkdir myproject; cd myproject; swarmlab-sec create"
+        echo""
+	else
+	echo "# -----------------------------------------------"
+	echo "#####  		Create project            #####"
+	echo "# -----------------------------------------------"
+
+
+	search='ok'
+	if [ $search == 'ok' ]
+	then
+		echo ">>>	Load Origin 	"
+		cat << EOF > $Wdir/Dockerfile
+		FROM $IMAGE_origin
+		#
+		USER root
+		COPY $bootstrap /usr/bin
+		COPY $hostnames_get /usr/bin
+		COPY $hostnames /usr/bin
+		COPY install-vim-plugin.sh .
+
+		ENV NOTVISIBLE "in users profile"
+		ENV USER1 docker
+		ENV USER_HOME /home/docker
+                ENV SSHDIR \${USER_HOME}/.ssh
+                ENV PATH=${PATH}:/usr/local/texlive/bin/x86_64-linuxmusl:/usr/local/texlive/2020/bin/x86_64-linuxmusl
+		COPY ssh/ \${SSHDIR}/
+
+		RUN export DEBIAN_FRONTEND=noninteractive  \
+                 && addgroup -S docker && adduser -S docker -G docker \
+		 && rm -rf /usr/share/doc \
+		 && rm -rf /usr/share/man \
+		 && rm -rf /usr/share/locale \
+		 && mkdir -p /var/run/sshd \
+		 && echo 'root:$ROOT_PASSWORD' | chpasswd \
+		 && echo "export VISIBLE=now" >> /etc/profile \
+		 && mkdir -p /home/docker/project \
+		 && mkdir -p /etc/opt \
+		&& echo "docker:docker" | chpasswd \
+		&& echo "StrictHostKeyChecking no" > \${SSHDIR}/config \
+		&& cat \${SSHDIR}/*.pub >> \${SSHDIR}/authorized_keys \
+		&& chmod -R 600 \${SSHDIR}/* \
+	        && chown -R \${USER1}:\${USER1} \${SSHDIR}
+
+                COPY custom /tmp/bin
+                RUN /tmp/bin/setup.sh
+
+
+
+		COPY  .vimrc /home/docker 
+		EXPOSE 3787
+EOF
+fi
+
+
+/bin/mkdir -p $Wdir/project
+/bin/mkdir -p $Wdir/logs
+/bin/cp -rf $DIR/project/bin $Wdir/project
+/bin/cp -rf $DIR/project/config $Wdir/project
+/bin/cp -f $DIR/project/hello_world.sh $Wdir/project
+/bin/cp -f $DIR/$bootstrap $Wdir/$bootstrap
+/bin/cp -f $DIR/$hostnames $Wdir/$hostnames
+/bin/cp -f $DIR/$hostnames_get $Wdir/$hostnames_get
+/bin/cp -f $DIR/ROOT_PASSWORD $Wdir/ROOT_PASSWORD
+/bin/cp -rf $DIR/.vimrc $Wdir/.vimrc
+/bin/cp -rf $DIR/bin $Wdir
+/bin/cp -rf $DIR/cls $Wdir
+/bin/cp -rf $DIR/extrapackages $Wdir
+/bin/cp -rf $DIR/setup.sh $Wdir
+/bin/cp -rf $DIR/fonts-extra $Wdir
+/bin/cp -rf $DIR/docs $Wdir
+/bin/cp -rf $DIR/run-gui.sh $Wdir/run-gui.sh
+/bin/cp -rf $DIR/latex-all $Wdir/latex-all
+/bin/cp -rf $DIR/install-vim-plugin.sh $Wdir/install-vim-plugin.sh
+/bin/cp -rf $DIR/custom $Wdir
+
+
+cat << EOF > $Wdir/docker-compose.yml
+version: "3"
+
+services:
+
+  masterservice:
+    image: $IMAGE_NAME
+    privileged: true
+    environment:
+     - NODENAME=${NODENAME}
+     - NODENETWORK=${NODENETWORK}
+     - DISPLAY=\${DISPLAY}
+    cap_add:
+      - NET_ADMIN
+    user: root
+    entrypoint: ["sec_bootstrap", "role=masterservice", "sec_master_service_name=masterservice", "sec_worker_service_name=workerservice"]
+    ports:
+      - "\${R_PORT1}:3787"
+    #  - "\${R_PORT2}:443"
+    networks:
+      - ${HYBRID_NETWORK}
+    volumes:
+      - $Wdir/project:/home/docker/project
+      - $Wdir/$bootstrap:/usr/bin/$bootstrap
+      - $Wdir/latex-all:/usr/local/bin/latex-all
+      - $Wdir/docs:/home
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - $Wdir/bin/ttyd.x86_64:/usr/bin/ttyd
+
+ 
+#  workerservice:
+#    image: $IMAGE_NAME
+#    privileged: true
+#    environment:
+#     - NODENAME=${NODENAME}
+#     - NODENETWORK=${NODENETWORK}
+#     - DISPLAY=\${DISPLAY}
+#    cap_add:
+#      - NET_ADMIN
+#    user: root
+#    entrypoint: ["sec_bootstrap", "role=workerservice", "sec_master_service_name=masterservice", "sec_worker_service_name=workerservice"]
+#    #ports:
+#    #  - "\${SSH_PORT}:22"
+#    networks:
+#      - ${HYBRID_NETWORK}
+#    volumes:
+#      - $Wdir/project:/home/docker/project
+#      - $Wdir/project/data-www:/data-www
+#      - $Wdir/project/config/nginx.conf:/etc/nginx/nginx.conf
+#      - $Wdir/project/config/default.conf:/etc/nginx/conf.d/default.conf
+#      - $Wdir/project/config/supervisord.conf:/etc/supervisor/supervisord.conf
+
+networks:
+  ${HYBRID_NETWORK}:
+EOF
+
+#/bin/cp -rf $DIR/ssh $Wdir
+
+cat << EOF > $Wdir/stop.sh
+../install/usr/share/swarmlab.io/sec/swarmlab-sec down
+EOF
+
+cat << EOF > $Wdir/container-stop.sh
+docker stop \$1
+docker container rm \$1
+EOF
+
+cat <<EOF 
+
+Project is Ready
+├── docker-compose.yml
+├── Dockerfile
+├── out.log
+├── project
+│   └── hello_world.sh
+└── ssh
+    ├── id_rsa
+    └── id_rsa.pub
+
+Run: make start
+
+     or run swarmlab-sec help for USAGE
+
+EOF
+
+/bin/chmod -R 777 $Wdir
+/bin/chown -R  sec.sec  $Wdir
+
+fi
+}
+
+#######################
+# TASK INDICATORS
+COMMAND_UP=0
+COMMAND_CREATE=0
+COMMAND_DOWN=0
+COMMAND_RELOAD=0
+COMMAND_SCALE=0
+COMMAND_LOGIN=0
+COMMAND_EXEC=0
+COMMAND_LIST=0
+COMMAND_CLEAN=0
+
+# Default values if providing empty
+SIZE=4
+
+#############################################
+usage ()
+{
+    echo ""
+    echo "--------------"
+    echo " SwarmLab.io "
+    echo "--------------"
+    echo ""
+    echo " USAGE: ./swarmlab-sec [COMMAND] [OPTIONS]"
+    echo ""
+    echo " Examples of [COMMAND] can be:"
+    echo "      create: create swarmlab-sec "
+    echo "          mkdir WORKdir; cd WORKdir; swarmlab-sec create"
+    echo ""
+    echo "      up: start swarmlab-sec"
+    echo "          swarmlab-sec up size=10"
+    echo ""
+    echo "      scale: resize the swarmlab-sec"
+    echo "          swarmlab-sec scale size=30"
+    echo ""
+    echo "      reload: rebuild image and distribute to nodes"
+    echo "          swarmlab-sec reload size=15"
+    echo ""
+    echo "      login: login to Docker container of MPI master node for interactive usage"
+    echo "          swarmlab-sec login"
+    echo ""
+    echo "      exec: execute shell command at the MPI master node"
+    echo "          swarmlab-sec exec [SHELL COMMAND]"
+    echo ""
+    echo "      down: shutdown swarmlab-sec"
+    echo "          swarmlab-sec down"
+    echo ""
+    echo "      clean: remove images in the system"
+    echo "          swarmlab-sec clean"
+    echo ""
+    echo "      list: show running containers of swarmlab-sec"
+    echo "          swarmlab-sec list"
+    echo ""
+    echo "      help: show this message"
+    echo "          swarmlab-sec help"
+    echo ""
+    echo "  "
+}
+
+HEADER="
+SwarmLab.io"
+
+clear_all ()
+{
+	$(docker stop $(docker ps -a | grep "${IMAGE_local}_masterservice_" | awk '{print $1}')) || true
+	$(docker stop $(docker ps -a | grep "${IMAGE_local}_workerservice_" | awk '{print $1}')) || true
+
+	#$(docker stop $(docker ps -a | grep "_registry_" | awk '{print $1}')) || true                      # remove for microservices
+	#docker ps -a | grep "_registry_" | awk '{print $1}' | xargs docker container rm || true            # remove for microservices
+	docker ps -a | grep "${IMAGE_local}_workerservice_" | awk '{print $1}' | xargs docker container rm || true
+	docker ps -a | grep "${IMAGE_local}_masterservice_" | awk '{print $1}' | xargs docker container rm || true
+    docker rmi $IMAGE_local -f
+}
+
+down_all ()
+{
+    printf "\\n\\n===> CLEAN UP SWARMLAB"
+
+    printf "\\n%s\\n" "$HEADER"
+    echo "$ docker-compose down"
+    printf "\\n"
+
+    docker-compose down
+}
+
+up_registry ()
+{
+    printf "\\n\\n===> SPIN UP REGISTRY"
+
+    printf "\\n%s\\n" "$HEADER"
+    echo "$ docker-compose up -d registry"
+    printf "\\n"
+
+    #docker stop swarmlab-registry || true && docker rm swarmlab-registry || true     # remove for microservices
+    docker container prune --force
+    docker-compose up --no-recreate -d registry
+}
+
+generate_ssh_keys ()
+{
+    if [ -f ssh/id_rsa ] && [ -f ssh/id_rsa.pub ]; then
+        return 0
+    fi
+
+    printf "\\n\\n===> GENERATE SSH KEYS \\n\\n"
+
+    echo "$ mkdir -p ssh/ "
+    printf "\\n"
+    mkdir -p ssh/
+
+    echo "$ ssh-keygen -f ssh/id_rsa -t rsa -N ''"
+    printf "\\n"
+    ssh-keygen -f ssh/id_rsa -t rsa -N ''
+}
+
+build_and_push_image ()
+{
+    printf "\\n\\n===> BUILD IMAGE"
+    printf "\\n%s\\n" "$HEADER"
+    echo "$ docker build -t \"$IMAGE_NAME\" ."
+    printf "\\n"
+    #docker build -t "$REGISTRY_ADDR:$REGISTRY_PORT/$IMAGE_NAME" .
+    docker build --force-rm --pull -t "$IMAGE_NAME" .
+
+}
+
+up_master ()
+{
+    printf "\\n\\n===> SPIN UP MASTER NODE"
+    printf "\\n%s\\n" "$HEADER"
+    echo "$ docker-compose up -d masterservice"
+    printf "\\n"
+    echo "$ $IMAGE_local -d $IMAGE_origin"
+    printf "\\n"
+
+    docker-compose rm -f -s -v 
+    docker-compose up --build --remove-orphans --force-recreate -d masterservice << ANSWERS
+yes
+yes
+yes
+ANSWERS
+    #docker-compose up   --force-recreate -d masterservice
+}
+
+
+up_workers ()
+{
+    printf "\\n\\n===> SPIN UP WORKER NODES"
+    printf "\\n%s\\n" "$HEADER"
+    echo "$ docker-compose up -d worker"
+    printf "\\n"
+    docker-compose rm -f -s -v 
+    docker-compose up --build --force-recreate --renew-anon-volumes --remove-orphans  -d workerservice
+    #docker-compose up   --force-recreate -d workerservice 
+
+    printf "\\n"
+    printf "\\n%s\\n" "$HEADER"
+
+    NUM_WORKER=$((SIZE - 1))
+    echo "$ docker-compose scale workerservice=$NUM_WORKER"
+    printf "\\n"
+    docker-compose scale workerservice=${NUM_WORKER}
+}
+
+down_master ()
+{
+    printf "\\n\\n===> TORN DOWN MASTER NODE"
+    printf "\\n%s\\n" "$HEADER"
+
+    echo "$ docker-compose stop masterservice && docker-compose rm -f masterservice"
+    printf "\\n"
+    docker-compose stop masterservice && docker-compose rm -f masterservice
+}
+
+down_workers ()
+{
+    printf "\\n\\n===> TORN DOWN WORKER NODES"
+    printf "\\n%s\\n" "$HEADER"
+    echo "$ docker-compose stop worker && docker-compose rm -f worker"
+    printf "\\n"
+    docker-compose stop workerservice && docker-compose rm -f workerservice
+}
+
+list ()
+{
+    printf "\\n\\n===> LIST CONTAINERS"
+    printf "\\n%s\\n" "$HEADER"
+    echo "$ docker-compose ps"
+    printf "\\n"
+    docker-compose ps
+}
+
+
+exec_on_mpi_master_container ()
+{
+    # shellcheck disable=SC2046
+    docker exec -it -u $DOCKERuser $(docker-compose ps | grep 'masterservice'| awk 'NR==1{print $1}') "$@"
+}
+
+prompt_ready ()
+{
+    printf "\\n\\n===> SWARMLAB READY \\n\\n"
+}
+
+show_instruction ()
+{
+    echo '                            ##         .          '
+    echo '                      ## ## ##        ==          '
+    echo '                   ## ## ## ## ##    ===          '
+    echo '               /"""""""""""""""""\___/ ===        '
+    echo '          ~~~ {~~ ~~~~ ~~~ ~~~~ ~~~ ~ /  ===- ~~~ '
+    echo '               \______ o           __/            '
+    echo '                 \    \         __/               '
+    echo '                  \____\_______/                  '
+    echo '                                                  '
+    echo '               Swarmlab.io Hybrid                 '
+    echo ''
+    echo '=============================================================='
+    echo ''
+
+    echo "To run SEC programs in an interative shell:"
+    echo "  1. Login to masterservice node:"
+    echo "     Using Container->connect Menou:"
+    echo "     copy/paste and Run command"
+    echo ""
+    echo "     Or using SSH with keys through exposed port:"
+    echo "     $ ssh -o \"StrictHostKeyChecking no\" -i ssh/id_rsa -p $SSH_PORT docker@localhost"
+    echo '       where [localhost] could be changed to the host IP of masterservice node'
+    echo ""
+    echo "  2. Execute programs inside masterservice node, for example:"
+    echo "     $ sudo su"
+    echo "     # apk update"
+    echo "      *----------------------------------------------------*"
+    echo "      | Default hostfile of connected nodes in the swarmlab |"
+    echo "      | To obtain hostfile manually: $ ./bin/swarmlab-nmap: > hosts   |"
+    echo "      * ---------------------------------------------------*"
+    echo ""
+    echo ""
+}
+
+
+
+#############################################
+
+while [ "$1" != "" ];
+do
+    PARAM=$(echo "$1" | awk -F= '{print $1}')
+    VALUE=$(echo "$1" | awk -F= '{print $2}')
+
+    case $PARAM in
+        help)
+            usage
+            exit
+            ;;
+        -i)
+            show_instruction
+            exit
+            ;;
+
+        login)
+            COMMAND_LOGIN=1
+            ;;
+
+        exec)
+            COMMAND_EXEC=1
+            shift # the rest is the shell command to run in the node
+            SHELL_COMMAND="$*"
+            break # end while loop
+            ;;
+
+        up)
+            COMMAND_UP=1
+            ;;
+
+        create)
+            COMMAND_CREATE=1
+            ;;
+
+        down)
+            COMMAND_DOWN=1
+            ;;
+
+        reload)
+            COMMAND_RELOAD=1
+            ;;
+
+        scale)
+            COMMAND_SCALE=1
+            ;;
+
+        list)
+            COMMAND_LIST=1
+            ;;
+
+        clean)
+            COMMAND_CLEAN=1
+            ;;
+
+        size)
+            [ "$VALUE" ] && SIZE=$VALUE
+            ;;
+
+        *)
+            echo "ERROR: unknown parameter \"$PARAM\""
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+
+if [ $COMMAND_UP -eq 1 ]; then
+    create_dockerfile
+    down_all
+    clear_all
+    #up_registry 	 	# remove for microservices
+    generate_ssh_keys
+    build_and_push_image	# remove for microservices
+    up_master
+    #up_workers
+
+    prompt_ready
+    show_instruction
+
+elif [ $COMMAND_CREATE -eq 1 ]; then
+    create_project
+
+elif [ $COMMAND_DOWN -eq 1 ]; then
+    down_all
+    clear_all
+
+elif [ $COMMAND_CLEAN -eq 1 ]; then
+    clear_all
+
+
+elif [ $COMMAND_SCALE -eq 1 ]; then
+    create_dockerfile
+    down_master
+    down_workers
+    up_master
+    #up_workers
+
+    prompt_ready
+    show_instruction
+
+elif [ $COMMAND_RELOAD -eq 1 ]; then
+    create_dockerfile
+    down_master
+    down_workers
+    build_and_push_image
+    up_master
+    #up_workers
+
+    prompt_ready
+    show_instruction
+
+elif [ $COMMAND_LOGIN -eq 1 ]; then
+    exec_on_mpi_master_container /bin/bash
+
+elif [ $COMMAND_EXEC -eq 1 ]; then
+    create_dockerfile
+    exec_on_mpi_master_container ash -c "${SHELL_COMMAND}"
+
+elif [ $COMMAND_LIST -eq 1 ]; then
+    list
+else
+    usage
+fi
+
