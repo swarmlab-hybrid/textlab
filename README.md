@@ -22,8 +22,22 @@
 
 This is a quickstart guide of howto use this **textLab**
 
+  **HowTo start it**
 
-**HowTo use it
+  (1) Create Project
+
+> make project-create
+
+  (2) Start Project
+
+> make project-start
+
+  (2.a) Stop Project**
+
+> make project-stop
+
+
+  **HowTo use it**
 
  (1) Edit xelatex/docs/main.tex
 
@@ -38,17 +52,17 @@ This is a quickstart guide of howto use this **textLab**
 > make latex-view
 
 
-### How to use biber
+ **How to use biber**
 
->
-> To compile you should  call (2), biber main, (2).
->
+  (1) edit bib
 
-### Default Configuration 
+> make latex-bib-edit
 
-- Working Directory
+  (2) build bib
 
-> /home
+> make latex-bib-build
+
+------------------------------------
 
 - Default user
 
@@ -151,48 +165,3 @@ http://www.docs.is.ed.ac.uk/skills/documents/3722/3722-2014.pdf
 
  
 
-### RUN INSTANCE
-
-Swarmlab services can be run in different ways. 
-
-- You can run them **through the swarmlab hybrid environment** (http://docs.swarmlab.io/SwarmLab-HowTos/swarmlab/docs/swarmlab/docs/hybrid/start-microservices.html)
-- or use them individually at will on the **command line of your system**
-
-
-
-#### CLI
-
-> git clone ...
->
-> cd [DIRECTORY]
->
-
-#### help
->
-> make help
->
-
-#### create service
->
-> make create
->
-
-#### start service
->
-> make start
->
-
-#### stop service
->
-> make stop
->
-
-#### list service
->
-> make list
->
-
-#### clean service
->
-> make clean
->

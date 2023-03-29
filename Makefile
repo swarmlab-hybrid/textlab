@@ -25,7 +25,9 @@ help:
 	@echo ""  ;
 	@echo "      latex-clean: clean latex docs "  ;
 	@echo ""  ;
-	@echo "      latex-bib: create  latex bib "  ;
+	@echo "      latex-bib-edit: edit latex bib "  ;
+	@echo ""  ;
+	@echo "      latex-bib-build: create  latex bib "  ;
 	@echo ""  ;
 	@echo "      latex-edit: edit main.tex "  ;
 	@echo ""  ;
