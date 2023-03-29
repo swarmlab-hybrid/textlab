@@ -29,6 +29,8 @@ help:
 	@echo ""  ;
 	@echo "      latex-edit: edit main.tex "  ;
 	@echo ""  ;
+	@echo "      latex-view: view main.pdf "  ;
+	@echo ""  ;
 	@echo "      project-start: start service "  ;
 	@echo ""  ;
 	@echo "      project-stop: shutdown service"  ;
@@ -55,6 +57,9 @@ latex-edit:
 
 latex-build:
 	@cd xelatex;  ./bin/make-clean-ant-compile.sh 2>/dev/null ; true
+
+latex-view:
+	@cd xelatex;  ./bin/latex-view.sh 2>/dev/null ; true
 
 latex-bib:
 	@cd xelatex;  ./bin/make-bib.sh 2>/dev/null ; true
