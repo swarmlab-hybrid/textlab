@@ -13,10 +13,36 @@
  > More info: http://docs.swarmlab.io/SwarmLab-HowTos/swarmlab/docs/swarmlab/docs/index.html
 
 
-![alt text](images/swarmlab-network.png "")
 
 ##  LabInstance textLab
 
+ **Features**
+
+This LabInstance provides a full framework for writing a graduate level thesis. It is carefully structured and separated into multiple parts for easy editing. Included are the following pages/sections:
+
+    A cover page
+    Declaration of authorship
+    Quotation
+    Abstract
+    Acknowledgements
+    Table Contents (automatically generated)
+    List of figures (automatically generated)
+    List of tables (automatically generated)
+    Abbreviations
+    Physical constants
+    Symbols
+    Dedication
+    Example chapter as help and showcase
+    Example appendix
+    Bibliography (automatically generated)
+
+You can remove any sections you do not require.
+
+ **Description**
+
+This template provides a full framework for writing a graduate level thesis. It is carefully structured and separated into multiple parts for easy editing. Included are all the sections listed above. An example chapter is also included, which explains the basics of LaTeX and this template. It contains everything you need to know to begin writing your academic thesis using this template.
+
+![alt text](images/ThesisTemplate.png "")
 
 ## Quickstart
 
@@ -68,6 +94,8 @@ This is a quickstart guide of howto use this **textLab**
  (3) View pdf
 
 > make latex-view
+
+
 
 
  **How to use biber**
