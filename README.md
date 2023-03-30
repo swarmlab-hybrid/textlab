@@ -41,6 +41,7 @@ A LaTeX thesis template that you can use to write your own academic thesis. The 
 
 You can remove any sections you do not require.
 
+> Preview https://git.swarmlab.io:3000/swarmlab/textlab/src/branch/master/images/LaTeXTemplates_masters-doctoral-thesis_v2.5.pdf
 
 ## Quickstart
 
