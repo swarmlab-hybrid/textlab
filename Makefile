@@ -31,6 +31,8 @@ help:
 	@echo ""  ;
 	@echo "      latex-edit: edit main.tex "  ;
 	@echo ""  ;
+	@echo "      latex-edit-key-map-features: help for neovim key map features "  ;
+	@echo ""  ;
 	@echo "      latex-view: view main.pdf "  ;
 	@echo ""  ;
 	@echo "      project-start: start service "  ;
@@ -85,4 +87,4 @@ project-clean:
 	@cd xelatex; ./install/usr/share/swarmlab.io/sec/swarmlab-sec clean 2>/dev/null ; true
 
 latex-edit-key-map-features:
-	@cd xelatex;  ./bin/neovim-key-map-features 2>/dev/null ; true
+	@cd xelatex; cat ./bin/neovim-key-map-features 2>/dev/null ; true
