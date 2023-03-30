@@ -63,7 +63,7 @@ This is a quickstart guide of howto use this **textLab**
 
 > make latex-build
 
->> neovim key features: https://git.swarmlab.io:3000/swarmlab/swarmlab-nvim
+>> neovim key map features: https://git.swarmlab.io:3000/swarmlab/swarmlab-nvim
 
  (3) View pdf
 
