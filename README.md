@@ -40,9 +40,10 @@ You can remove any sections you do not require.
 
  **Description**
 
+![alt text](images/ThesisTemplate.png "")
+
 This template provides a full framework for writing a graduate level thesis. It is carefully structured and separated into multiple parts for easy editing. Included are all the sections listed above. An example chapter is also included, which explains the basics of LaTeX and this template. It contains everything you need to know to begin writing your academic thesis using this template.
 
-![alt text](images/ThesisTemplate.png "")
 
 ## Quickstart
 
