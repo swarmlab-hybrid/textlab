@@ -16,9 +16,14 @@
 
 ##  LabInstance textLab
 
- **Features**
 
-This LabInstance provides a full framework for writing a graduate level thesis. It is carefully structured and separated into multiple parts for easy editing. Included are the following pages/sections:
+![alt text](images/ThesisTemplate.png "")
+
+There is a LaTeX thesis template that you can use to write your own academic thesis with. The template provides a powerful framework for organising and writing your work and a lot of subtle formatting at the finest level of detail that will produce the most beautiful looking thesis.
+
+It is carefully structured and separated into multiple parts for easy editing. Included are all the sections listed above. An example chapter is also included, which explains the basics of LaTeX and this template. It contains everything you need to know to begin writing your academic thesis using this template.
+
+ **Features**
 
     A cover page
     Declaration of authorship
@@ -37,12 +42,6 @@ This LabInstance provides a full framework for writing a graduate level thesis. 
     Bibliography (automatically generated)
 
 You can remove any sections you do not require.
-
- **Description**
-
-![alt text](images/ThesisTemplate.png "")
-
-This template provides a full framework for writing a graduate level thesis. It is carefully structured and separated into multiple parts for easy editing. Included are all the sections listed above. An example chapter is also included, which explains the basics of LaTeX and this template. It contains everything you need to know to begin writing your academic thesis using this template.
 
 
 ## Quickstart
