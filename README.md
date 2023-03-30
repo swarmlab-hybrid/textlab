@@ -48,7 +48,7 @@ This is a quickstart guide of howto use this **textLab**
 
 > make project-start
 
-  (2.a) Stop Project**
+  (2.a) Stop Project
 
 > make project-stop
 
@@ -61,9 +61,9 @@ This is a quickstart guide of howto use this **textLab**
 
  (2) Compile LaTeX document
 
->> neovim help here: https://git.swarmlab.io:3000/swarmlab/swarmlab-nvim
-
 > make latex-build
+
+>> neovim key features: https://git.swarmlab.io:3000/swarmlab/swarmlab-nvim
 
  (3) View pdf
 
