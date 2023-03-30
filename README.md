@@ -22,6 +22,22 @@
 
 This is a quickstart guide of howto use this **textLab**
 
+   **Clone repo**
+
+    (1) mkdir [dir4project]
+
+    (2) cd [dir4project]
+
+    (3) git clone 
+> GIT_SSL_NO_VERIFY=true git clone https://git.swarmlab.io:3000/swarmlab/swarmlab-nvim.git
+
+
+>  On Error: "x509: certificate signed by unknown authority
+>  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>> See http://docs.swarmlab.io/SwarmLab-HowTos/swarmlab/docs/swarmlab/docs/install/install-docker.html#fix-x509-certificate-signed-by-unknown-authority-issue
+>
+
+
   **HowTo start it**
 
   (1) Create Project
@@ -44,6 +60,8 @@ This is a quickstart guide of howto use this **textLab**
 > make latex-edit
 
  (2) Compile LaTeX document
+
+>> neovim help here: https://git.swarmlab.io:3000/swarmlab/swarmlab-nvim
 
 > make latex-build
 
