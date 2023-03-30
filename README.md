@@ -19,8 +19,7 @@
 
 ![alt text](images/ThesisTemplate.png "")
 
-There is a LaTeX thesis template that you can use to write your own academic thesis with. The template provides a powerful framework for organising and writing your work and a lot of subtle formatting at the finest level of detail that will produce the most beautiful looking thesis.
-
+A LaTeX thesis template that you can use to write your own academic thesis. The template provides a powerful framework for organizing and writing your thesis and many subtle formatting options at the finest level of detail that will create the most beautiful thesis.
 It is carefully structured and separated into multiple parts for easy editing. Included are all the sections listed above. An example chapter is also included, which explains the basics of LaTeX and this template. It contains everything you need to know to begin writing your academic thesis using this template.
 
  **Features**
