@@ -83,3 +83,6 @@ project-stop:
 
 project-clean:
 	@cd xelatex; ./install/usr/share/swarmlab.io/sec/swarmlab-sec clean 2>/dev/null ; true
+
+latex-edit-key-map-features:
+	@cd xelatex;  ./bin/neovim-key-map-features 2>/dev/null ; true

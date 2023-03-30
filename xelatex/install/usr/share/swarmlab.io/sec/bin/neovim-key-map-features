@@ -1,0 +1,106 @@
+
+Key map features
+
+I try to avoid C- combinations for the things I do frequently, mapping things that make sense to the key.
+
+The leader key provides a facility for creating customized shortcuts that can be further restricted to apply only in certain modes, such as normal, insert, visual, terminal (neovim-specific), etc.
+
+The leader key is normally defined by the mapleader variable as .
+
+Normal mode
+Edit Action
+
+    \ls Remove all whitespace at the end of every line in the buffer
+    p Paste below
+    P Paste above
+
+Select text with: CTRL-V -or- SHIT-V amd Arrows
+
+AND
+
+    esc Y to Copy
+
+    use: Clipboard/Register Manager to paste
+
+View Action
+
+    \n Toggle line numbers
+    \w Toggle wrap
+
+Copy2System Buffer
+
+    Select text:
+    CTRL + V -OR- SHIFT + V and use Arrows to select
+    CTRL + C Copy
+    SHIFT + INS Paste
+
+Clipboard/Register Manager
+
+    \r Open Register Menou
+    Esc Close Register Menou
+    p Paste below
+    CTRL-p Paste above
+
+Menou / File explorer
+
+    Space	Toggle NERD Tree, a file tree explorer.
+    \h Toggle distraction free mode (hide/show both nerdtree and tagbar)
+    \tb Toggle tagbar
+
+Open File with explorer
+
+    Space Toggle NERD Tree, a file tree explorer.
+    s open file in new Buffer (vertical split)
+    i open file in new Buffer (horizontal split)
+    ENTER open file in current Buffer
+    SHIFT + R reload explorer view
+
+Buffers / Split
+
+    \bv	Create a new (empty) buffer to the right of a vertical split
+    \bv Create a new (empty) buffer to the right of a vertical split
+    \bh Create a new (empty) buffer below a horizontal split
+    \bk Kill current buffer (don't prompt to save changes)
+    \bl List buffers
+    \bg List and select buffer by #
+    ALT - [Left arrow] Go to buffer to the left
+    ALT - [Down arrow] Go to buffer below
+    ALT - [Up arrow] Go to buffer above
+    ALT - [Right arrow] Go to buffer to the right
+
+Resize Buffers / Split
+
+Try:
+
+    CTRL + [LEFT SHIFT] + [Left arrow]
+    CTRL + [LEFT SHIFT] + [Down arrow]
+    CTRL + [LEFT SHIFT] + [Up arrow]
+    CTRL + [LEFT SHIFT] + [Right arrow]
+
+Terminal
+
+    \tt Open a full screen terminal
+    \tv Open a terminal in a new split to the right
+    \th Open a terminal in a new split below
+
+Tabs
+
+    create tab esc :tabnew
+    SHIFT Go to Tab to the right
+    SHIFT - TAB Go to Tab to the left
+
+Theme
+
+    \c Toggle between light and dark backround modes (for supported themes)
+
+Insert mode
+Greek/Latin letters
+
+    < F8 > Greek characters
+
+    < F5 > Latin characters
+
+Spell check
+
+    ctrl-x s
+
